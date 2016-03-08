@@ -1,0 +1,19 @@
+{
+  "name": "chapter04",
+  "version": "1.0.0",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-arrays": "~0.4.0",
+    "purescript-strings": "~0.7.0",
+    "purescript-foldable-traversable": "~0.4.0",
+    "purescript-console": "~0.1.0"
+  }
+}

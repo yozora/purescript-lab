@@ -1,0 +1,17 @@
+{
+  "name": "chapter03",
+  "version": "1.0.0",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-lists": "^0.7.0",
+    "purescript-console": "^0.1.0"
+  }
+}
