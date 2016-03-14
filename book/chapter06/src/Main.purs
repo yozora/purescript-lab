@@ -1,9 +1,12 @@
 module Main where
 
-import Prelude
-import Control.Monad.Eff
-import Control.Monad.Eff.Console
-import Data.Foldable
+import Prelude (class Eq, class Functor, class Semigroup, class Show, class Ord,
+                Unit, Ordering(GT, LT), map, (++), (==), (&&), (<$>),
+                show, compare, eq) 
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (CONSOLE, log)
+import Data.Foldable (class Foldable, foldMap, foldl, foldr)
+import Data.Monoid (class Monoid)
 
 data Extended a = Finite a | Infinite
 
@@ -15,7 +18,6 @@ instance ordExtended :: (Ord a) => Ord (Extended a) where
   compare _ Infinite = LT
   compare Infinite _ = GT
   compare (Finite a) (Finite b) = compare a b
-  compare _ _ = EQ
 
 instance showExtended :: (Show a) => Show (Extended a) where
   show (Finite a) = "(Finite " ++ (show a) ++ ")"
@@ -65,7 +67,12 @@ instance foldableOneMore :: (Foldable f) => Foldable (OneMore f) where
   foldl f s (OneMore x xs) = foldl f (f s x) xs
   foldMap f (OneMore x xs) = (f x) ++ (foldMap f xs)
 
-    
+class (Monoid m) <= Action m a where
+  act :: m -> a -> a
+
+instance actionArray :: (Action m a) => Action m (Array a) where
+  act m = map (act m)
+
 main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do
  log "Hello sailor!"
