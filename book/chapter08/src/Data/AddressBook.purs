@@ -1,4 +1,13 @@
-module Data.AddressBook where
+module Data.AddressBook
+  ( Address(..)
+  , address
+  , PhoneType(..)
+  , PhoneNumber(..)
+  , phoneNumber
+  , Person(..)
+  , person
+  , examplePerson
+  ) where
 
 import Prelude (class Show, show, (++))
 

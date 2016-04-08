@@ -1,6 +1,6 @@
 "use strict";
 
-// module Control.Monad.Eff.Dom
+// module Control.Monad.Eff.DOM
 
 /// body :: forall eff. Eff (dom :: DOM | eff) Node
 exports.body = function () {
