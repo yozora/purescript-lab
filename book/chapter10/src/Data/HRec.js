@@ -25,7 +25,7 @@ exports.mapHRec = function (fn, record) {
 
 /// foreign import foldHRec :: forall a r. Fn3 (Fn3 r String a r) r (HRec a) r
 exports.foldHRec = function (foldFn, seed, record) {
-    var acc = seed
+    var acc = seed;
     Object.keys(record).forEach(function (key) {
         acc = foldFn(acc, key, record[key]);
     });
