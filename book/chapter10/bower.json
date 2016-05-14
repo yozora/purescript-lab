@@ -15,5 +15,9 @@
     "purescript-foreign": "^0.7.2",
     "purescript-dom": "^0.2.21",
     "purescript-validation": "^0.2.1"
+  },
+  "devDependencies": {
+    "purescript-test-unit": "^6.0.0",
+    "purescript-quickcheck": "^0.12.2"
   }
 }

@@ -31,3 +31,9 @@ exports.foldHRec = function (foldFn, seed, record) {
     });
     return acc;
 };
+
+/// foreign import lookupImpl :: forall v. Fn4 (Maybe v) (v -> (Maybe v)) String (HRec v) (Maybe v) 
+exports.lookupImpl = function (nothing, just, key, record) {
+    var val = record[key];
+    return (typeof val === "undefined") ? nothing : just(val);
+};
