@@ -1,0 +1,6 @@
+{
+    "private": true,
+    "scripts": {
+        "test": "jshint src && jscs src && pulp test"
+    }
+}

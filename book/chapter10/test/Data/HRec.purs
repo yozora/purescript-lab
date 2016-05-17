@@ -23,7 +23,7 @@ main = do
       Assert.equal (lookup "b" r) (Just 2)
       Assert.equal (lookup "c" r) (Just 2)
     test "Empty" do
-      Assert.equal (runFn3 foldHRec combine "" empty) "" 
+      Assert.equal (foldHRec combine "" empty) "" 
       where
-        combine = mkFn3 \r k v -> r ++ k ++ v
+        combine = \r k v -> r ++ k ++ v
 

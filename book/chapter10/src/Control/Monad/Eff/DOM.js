@@ -31,7 +31,7 @@ exports.appendChild = function (child) {
     };
 };
 
-/// setText :: forall eff. String -> Node -> Eff (dom :: DOM | eff) Node 
+/// setText :: forall eff. String -> Node -> Eff (dom :: DOM | eff) Node
 exports.setText = function (text) {
     return function (node) {
         return function () {
@@ -57,7 +57,7 @@ exports.getValue = function (node) {
         return node.value;
     };
 };
-/// setValue :: forall a eff. a -> Node -> Eff (dom :: DOM | eff) Node 
+/// setValue :: forall a eff. a -> Node -> Eff (dom :: DOM | eff) Node
 exports.setValue = function (value) {
     return function (node) {
         return function () {
@@ -76,7 +76,7 @@ exports.setInnerHTML = function (html) {
         };
     };
 };
-/// addEventListener :: forall eff. String -> Eff (dom :: DOM | eff) Unit -> Node -> Eff (dom :: DOM | eff) Unit 
+/// addEventListener :: forall eff. String -> Eff (dom :: DOM | eff) Unit -> Node -> Eff (dom :: DOM | eff) Unit
 exports.addEventListener = function (name) {
     return function (handler) {
         return function (node) {

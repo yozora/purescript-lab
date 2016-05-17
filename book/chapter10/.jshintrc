@@ -1,0 +1,4 @@
+{
+    "strict": "global",
+    "predef": ["exports", "document", "window"]
+}
