@@ -17,5 +17,8 @@
     "purescript-transformers": "^0.8.4",
     "purescript-node-readline": "^0.5.0",
     "purescript-yargs": "^0.7.3"
+  },
+  "devDependencies": {
+    "purescript-test-unit": "^6.0.1"
   }
 }
