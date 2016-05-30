@@ -2,18 +2,29 @@ module Exercise
        ( testParens
        , Level, Doc, line, indent, cat, render
        , collatzLength, collatzSeq
+       , safeDivide
+       , runParser, string, abParser, absParser
        ) where
 
-import Prelude (Unit, bind, return, flip, (<<<)
-               , ($), (+), (-), (*), (/), eq, (==), mod)
+import Prelude (Unit, bind, return, flip, (<<<), map, show
+               , ($), (+), (-), (*), (/), (++), eq, (==), mod)
 import Data.Array (replicate, snoc)
-import Data.String (split, joinWith)
-import Data.Foldable (traverse_)
+import Data.Maybe (Maybe(..))
+import Data.String (split, joinWith, stripPrefix, drop, take)
+import Data.Foldable (traverse_, fold)
 import Data.Traversable (sequence)
-import Data.Tuple (fst, snd)
-import Control.Monad.State (State, execState, modify)
+import Data.Tuple (Tuple(), fst, snd)
+import Data.Identity (Identity(..), runIdentity)
+import Data.Either (Either(..))
+import Data.List (some)
+import Control.Alt ((<|>))
+import Control.MonadPlus (guard)
+import Control.Monad.State (State, execState, modify, get, put)
 import Control.Monad.Reader (Reader, ask, local, runReader)
 import Control.Monad.Writer (Writer, tell, runWriter)
+import Control.Monad.State.Trans (StateT(), runStateT)
+import Control.Monad.Writer.Trans (WriterT(), runWriterT)
+import Control.Monad.Except.Trans (ExceptT(..), runExceptT, throwError)
 
 testParens :: String -> Boolean
 testParens str =
@@ -56,13 +67,69 @@ collatzLengthImpl = helper 0
       helper (acc + 1) (collatz n)
 
     collatz :: Int -> Int 
-    collatz n =
-      case n of
-        y | y `mod` 2 == 0 -> y / 2
-        y -> y * 3 + 1
+    collatz y | (y `mod` 2 == 0) =
+      y /2
+    collatz y =
+      y * 3 + 1
 
 collatzLength :: Int -> Int
 collatzLength = fst <<< runWriter <<< collatzLengthImpl
 
 collatzSeq :: Int -> Array Int
 collatzSeq = snd <<< runWriter <<< collatzLengthImpl
+
+
+safeDivide :: Number -> Number -> ExceptT String Identity Number
+safeDivide n 0.0 = ExceptT <<< Identity $ Left "Divide by 0"
+safeDivide n d = ExceptT <<< Identity $ Right (n / d)
+
+
+type Errors = Array String
+
+type Log = Array String
+
+type Parser = StateT String (WriterT Log (ExceptT Errors Identity))
+
+runParser :: Parser String -> String -> Either Errors (Tuple (Tuple String String) Log)
+runParser p s = runIdentity $ runExceptT $ runWriterT $ runStateT p s
+
+next :: Parser String
+next = do
+  s <- get
+  tell ["The state is " ++ show s]
+  case s of
+    "" -> throwError ["Empty String"]
+    _ -> do
+      put (drop 1 s)
+      return (take 1 s)
+
+satisfy :: (String -> Boolean) -> Parser String
+satisfy pred = do
+  s <- next
+  guard $ pred s
+  return s
+      
+string :: String -> Parser String
+string pre = do
+  s <- get
+  tell [ "The state is " ++ show s ]
+  case (stripPrefix pre s) of
+    (Just suf) -> do
+      put (suf)
+      return (pre)
+    _ -> do
+      throwError ["No match"]
+
+abParser :: Parser String
+abParser = do
+  as <- some $ satisfy (eq "a")
+  bs <- some $ satisfy (eq "b")
+  return $ fold (as ++ bs)
+
+absParser :: Parser String
+absParser = 
+  map fold $ some $ aParser <|> bParser
+  where
+    aParser = map fold $ some $ satisfy (eq "a")
+    bParser = map fold $ some $ satisfy (eq "b")
+
