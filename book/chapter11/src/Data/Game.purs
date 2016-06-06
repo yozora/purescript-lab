@@ -1,6 +1,7 @@
 module Data.Game
        ( PlayerName
-       , Coords
+       , Coords(..)
+       , GameDirection(..)
        , GameEnvironment(..)
        , GameItem(..)
        , GameState(..)
@@ -20,6 +21,8 @@ import Data.Map as M
 import Data.Set as S
 
 type PlayerName = String
+
+data GameDirection = North | South | East | West
 
 newtype Coords = Coords
   { x :: Int

@@ -1,10 +1,12 @@
 module Main where
 
 import Prelude ( Unit, unit, bind, return, show, map
+               , (+), (-)
                , ($), (#), (<<<), (++), (<$>), (<*>))
 
 import Data.Game ( GameEnvironment, GameState(..), GameItem
-                 , Coords, coords, gameEnvironment
+                 , GameDirection(North,South)
+                 , Coords(..), coords, gameEnvironment
                  , initialGameState )
 
 import Data.Either (Either(Right))
@@ -15,7 +17,7 @@ import Data.List as L
 import Data.Set as S
 import Data.Map as M
 
-import Control.Monad.RWS (RWS, get, put, tell, runRWS)
+import Control.Monad.RWS (RWS, get, put, modify, tell, runRWS)
 import Control.Monad.RWS.Trans (RWSResult(..))
 
 import Control.Monad.Eff (Eff)
@@ -47,6 +49,17 @@ gameMap =
   # M.insert (coords 0 1) (MapCell { description: "You are in a clearing."})
             
 -- Game Logic
+
+move :: GameDirection -> Game Unit
+move dir = do
+  GameState state <- get
+  modify (\(GameState state) -> GameState state { player = updatePlayer state.player })
+  where
+    updatePlayer (Coords p) =
+      case dir of
+        North -> (coords p.x (p.y + 1))
+        South -> (coords p.x (p.y - 1))
+        _ -> (coords p.x p.y)
 
 describeRoom :: Game Unit
 describeRoom = do
@@ -83,6 +96,8 @@ convertResult (RWSResult s a w) =
 
 game :: Array String -> Game Unit
 game ["look"] = describeRoom
+game ["move", "north"] = move North
+game ["move", "south"] = move South
 game ["quit"] = do
   GameState state <- get
   put $ GameState state { gameRunning = false }
