@@ -7,6 +7,7 @@ module Data.Game
        , GameState(..)
        , coords
        , gameEnvironment
+       , readItem
        , initialGameState
        ) where
 
@@ -14,6 +15,7 @@ import Prelude ( (++), ($), (<>), (&&)
                , Ordering(..)
                , class Show, show, class Eq, eq
                , class Ord, compare )
+import Data.Maybe (Maybe(Just, Nothing))
 
 import Data.Tuple (Tuple(..))
 import Data.List as L
@@ -73,6 +75,11 @@ instance ordGameItem :: Ord GameItem where
 instance showGameItem :: Show GameItem where
   show Candle = "(GameItem Candle)"
   show Matches = "(GameItem Matches)"
+
+readItem :: String -> Maybe GameItem
+readItem "candle" = Just Candle
+readItem "matches" = Just Matches
+readItem _ = Nothing
 
 newtype GameState = GameState
   { items :: M.Map Coords (S.Set GameItem)

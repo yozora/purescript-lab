@@ -4,10 +4,11 @@ import Prelude ( Unit, unit, bind, return, show, map
                , (+), (-)
                , ($), (#), (<<<), (++), (<$>), (<*>))
 
-import Data.Game ( GameEnvironment, GameState(..), GameItem
+import Data.Game ( GameEnvironment(..), GameState(..), GameItem(..)
                  , GameDirection(North,South)
-                 , Coords(..), coords, gameEnvironment
-                 , initialGameState )
+                 , Coords(..), coords
+                 , readItem
+                 , gameEnvironment , initialGameState )
 
 import Data.Either (Either(Right))
 import Data.Foldable (for_)
@@ -17,7 +18,7 @@ import Data.List as L
 import Data.Set as S
 import Data.Map as M
 
-import Control.Monad.RWS (RWS, get, put, modify, tell, runRWS)
+import Control.Monad.RWS (RWS, get, put, ask, modify, tell, runRWS)
 import Control.Monad.RWS.Trans (RWSResult(..))
 
 import Control.Monad.Eff (Eff)
@@ -86,6 +87,22 @@ pickup item = do
       tell $ L.singleton $ "You now have the " ++ (show item)
     _ -> tell $ L.singleton $ "I don't see that item here"
 
+use :: GameItem -> Game Unit
+use Candle = tell (L.singleton "What do I do with that.")
+use Matches = do
+  hasCandle <- has Candle
+  if hasCandle
+    then do
+      GameEnvironment env <- ask
+      tell (L.toList [ "You light the candle."
+                     , "Congratulations, " ++ env.playerName ++ "!"
+                     , "You Win!!"
+                     ])
+
+      GameState state <- get
+      put $ GameState state { gameRunning = false }
+    else tell (L.singleton "You don't have anything to light.")
+
 type See s a w = { log :: w, result :: a, state :: s }
 
 convertResult :: forall s a w. RWSResult s a w -> See s a w
@@ -98,6 +115,18 @@ game :: Array String -> Game Unit
 game ["look"] = describeRoom
 game ["move", "north"] = move North
 game ["move", "south"] = move South
+game ["take", item] =
+  case readItem item of
+    Nothing -> tell (L.singleton ("I don't understand " ++ item))
+    Just item -> pickup item
+game ["use", item] =
+  case readItem item of
+    Nothing -> tell (L.singleton ("I don't understand " ++ item))
+    Just gameItem -> do
+      hasItem <- has gameItem
+      if hasItem
+         then use gameItem
+         else tell (L.singleton ("You don't have the " ++ item))
 game ["quit"] = do
   GameState state <- get
   put $ GameState state { gameRunning = false }
